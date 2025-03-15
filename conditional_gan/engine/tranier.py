@@ -394,7 +394,7 @@ class Trainer:
             num_classes = self.model_config_dict.G.NUM_CLASSES
             if self.model_config_dict.G.TYPE == "vanilla_net":
                 noise = torch.randn([batch_size, self.model_config_dict.G.LATENT_DIM], device=self.device)
-                conditional = torch.randint(0, num_classes - 1, (batch_size,), device=self.device)
+                conditional = target
             elif self.model_config_dict.G.TYPE == "conv_net":
                 noise = torch.randn([batch_size, self.model_config_dict.G.LATENT_DIM], device=self.device)
                 conditional = F_torch.one_hot(target, num_classes).to(self.device).float()
