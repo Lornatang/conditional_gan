@@ -107,15 +107,14 @@ class Trainer:
         self.d_g_z2_losses: AverageMeter = AverageMeter("D(G(z2))", ":.4e")
 
         # eval for training
+        num_classes = self.model_config_dict.G.NUM_CLASSES
         if self.model_config_dict.G.TYPE == "vanilla_net":
             self.fixed_noise = torch.randn([self.train_batch_size, self.model_config_dict.G.LATENT_DIM], device=device)
-            self.fixed_conditional = torch.randint(0, self.model_config_dict.G.NUM_CLASSES - 1, (self.train_batch_size,), device=device)
+            self.fixed_conditional = torch.randint(0, num_classes, (self.train_batch_size,), device=device)
         elif self.model_config_dict.G.TYPE == "conv_net":
             self.fixed_noise = torch.randn([self.train_batch_size, self.model_config_dict.G.LATENT_DIM], device=device)
-            self.fixed_conditional = torch.randint(0,
-                                                   self.model_config_dict.G.NUM_CLASSES - 1,
-                                                   (self.train_batch_size, self.model_config_dict.G.NUM_CLASSES),
-                                                   device=self.device)
+            conditional = torch.randint(0, num_classes, (self.train_batch_size, 1), device=self.device)
+            self.fixed_conditional = F_torch.one_hot(conditional.view(-1), num_classes).view(self.train_batch_size, num_classes).float()
         else:
             raise NotImplementedError(f"Model type `{self.model_config_dict.G.TYPE}` is not implemented.")
         self.save_visual_dir = self.save_dir.joinpath("visual")
